@@ -337,6 +337,9 @@ class OSNet(nn.Module):
             feature_dim, channels[3], dropout_p=None
         )
         # identity classification layer
+        print("=== log ===")
+        print(self.feature_dim)
+        print(num_classes)
         self.classifier = nn.Linear(self.feature_dim, num_classes)
 
         self._init_params()

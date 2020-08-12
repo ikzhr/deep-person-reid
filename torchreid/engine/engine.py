@@ -406,21 +406,22 @@ class Engine(object):
             distmat_gg = metrics.compute_distance_matrix(gf, gf, dist_metric)
             distmat = re_ranking(distmat, distmat_qq, distmat_gg)
 
-        print('Computing CMC and mAP ...')
-        cmc, mAP = metrics.evaluate_rank(
-            distmat,
-            q_pids,
-            g_pids,
-            q_camids,
-            g_camids,
-            use_metric_cuhk03=use_metric_cuhk03
-        )
+        cmc = [0]
+        # print('Computing CMC and mAP ...')
+        # cmc, mAP = metrics.evaluate_rank(
+        #     distmat,
+        #     q_pids,
+        #     g_pids,
+        #     q_camids,
+        #     g_camids,
+        #     use_metric_cuhk03=use_metric_cuhk03
+        # )
 
-        print('** Results **')
-        print('mAP: {:.1%}'.format(mAP))
-        print('CMC curve')
-        for r in ranks:
-            print('Rank-{:<3}: {:.1%}'.format(r, cmc[r - 1]))
+        # print('** Results **')
+        # print('mAP: {:.1%}'.format(mAP))
+        # print('CMC curve')
+        # for r in ranks:
+        #     print('Rank-{:<3}: {:.1%}'.format(r, cmc[r - 1]))
 
         if visrank:
             visualize_ranked_results(

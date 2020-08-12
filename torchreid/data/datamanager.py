@@ -172,7 +172,8 @@ class ImageDataManager(DataManager):
         train_sampler_t='RandomSampler',
         cuhk03_labeled=False,
         cuhk03_classic_split=False,
-        market1501_500k=False
+        market1501_500k=False,
+        test_only=False
     ):
 
         super(ImageDataManager, self).__init__(
@@ -186,42 +187,46 @@ class ImageDataManager(DataManager):
             use_gpu=use_gpu
         )
 
-        print('=> Loading train (source) dataset')
+        self._num_train_pids = None
+        self._num_train_cams = None
+        self.train_loader = None
         trainset = []
-        for name in self.sources:
-            trainset_ = init_image_dataset(
-                name,
-                transform=self.transform_tr,
-                k_tfm=k_tfm,
-                mode='train',
-                combineall=combineall,
-                root=root,
-                split_id=split_id,
-                cuhk03_labeled=cuhk03_labeled,
-                cuhk03_classic_split=cuhk03_classic_split,
-                market1501_500k=market1501_500k
-            )
-            trainset.append(trainset_)
-        trainset = sum(trainset)
+        if not test_only:
+            print('=> Loading train (source) dataset')
+            for name in self.sources:
+                trainset_ = init_image_dataset(
+                    name,
+                    transform=self.transform_tr,
+                    k_tfm=k_tfm,
+                    mode='train',
+                    combineall=combineall,
+                    root=root,
+                    split_id=split_id,
+                    cuhk03_labeled=cuhk03_labeled,
+                    cuhk03_classic_split=cuhk03_classic_split,
+                    market1501_500k=market1501_500k
+                )
+                trainset.append(trainset_)
+            trainset = sum(trainset)
 
-        self._num_train_pids = trainset.num_train_pids
-        self._num_train_cams = trainset.num_train_cams
+            self._num_train_pids = trainset.num_train_pids
+            self._num_train_cams = trainset.num_train_cams
 
-        self.train_loader = torch.utils.data.DataLoader(
-            trainset,
-            sampler=build_train_sampler(
-                trainset.train,
-                train_sampler,
+            self.train_loader = torch.utils.data.DataLoader(
+                trainset,
+                sampler=build_train_sampler(
+                    trainset.train,
+                    train_sampler,
+                    batch_size=batch_size_train,
+                    num_instances=num_instances,
+                    num_cams=num_cams
+                ),
                 batch_size=batch_size_train,
-                num_instances=num_instances,
-                num_cams=num_cams
-            ),
-            batch_size=batch_size_train,
-            shuffle=False,
-            num_workers=workers,
-            pin_memory=self.use_gpu,
-            drop_last=True
-        )
+                shuffle=False,
+                num_workers=workers,
+                pin_memory=self.use_gpu,
+                drop_last=True
+            )
 
         self.train_loader_t = None
         if load_train_targets:

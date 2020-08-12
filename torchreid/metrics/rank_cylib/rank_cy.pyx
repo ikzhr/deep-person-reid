@@ -157,6 +157,7 @@ cpdef eval_market1501_cy(float[:,:] distmat, long[:] q_pids, long[:]g_pids,
     cdef long num_q = distmat.shape[0]
     cdef long num_g = distmat.shape[1]
 
+    print(num_g)
     if num_g < max_rank:
         max_rank = num_g
         print('Note: number of gallery samples is quite small, got {}'.format(num_g))
@@ -182,11 +183,14 @@ cpdef eval_market1501_cy(float[:,:] distmat, long[:] q_pids, long[:]g_pids,
         float[:] tmp_cmc = np.zeros(num_g, dtype=np.float32)
         float tmp_cmc_sum
     
+    print(num_g)
     for q_idx in range(num_q):
         # get query pid and camid
         q_pid = q_pids[q_idx]
         q_camid = q_camids[q_idx]
 
+        print("=== q_pid, q_camid ===")
+        print(q_pid, q_camid)
         # remove gallery samples that have the same pid and camid with query
         for g_idx in range(num_g):
             order[g_idx] = indices[q_idx, g_idx]
@@ -197,6 +201,7 @@ cpdef eval_market1501_cy(float[:,:] distmat, long[:] q_pids, long[:]g_pids,
             if (g_pids[order[g_idx]] != q_pid) or (g_camids[order[g_idx]] != q_camid):
                 raw_cmc[num_g_real] = matches[q_idx][g_idx]
                 num_g_real += 1
+                print(matches[q_idx][g_idx])
                 if matches[q_idx][g_idx] > 1e-31:
                     meet_condition = 1
         
